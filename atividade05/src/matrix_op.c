@@ -102,12 +102,12 @@ fclose(print_data);
 => Parâmetros: Resultado da multiplicação, matriz 1 com linhas e colunas, matriz 2 com linhas e colunas
 => Retorno: (void function) */
 void multiplicarMatrizes(float *result, float *mat1, int line_m1, int col_m1, float *mat2, int line_m2, int col_m2){
-   	    
+	
 	for(int i = 0; i < line_m1; i++){
 		for(int j = 0; j < col_m2; j++){
             *(result + i*col_m2 + j) = 0;
 			for(int k = 0; k < col_m1; k++){
-				result[i*col_m2 + j] += mat1[i*col_m1 + k] * mat2[k*col_m2 + j];
+				*(result + i*col_m2 + j) += *(mat1 + i*col_m1 + k) * *(mat2 + k*col_m2 + j);
 			}
 		}
 	}	
@@ -115,7 +115,7 @@ void multiplicarMatrizes(float *result, float *mat1, int line_m1, int col_m1, fl
 
 /* Função para liberar memória após alocação dinâmica de vetores
 => Parâmetros: Ponteiro do array;
-=> Retorno: Referência na memória do array alocado. */
+=> Retorno: (void function) */
 void liberarMatriz(float *data){
 	free(data);
 }

@@ -4,8 +4,8 @@ GCC = mpicc
 BIN = bin
 OBJ = obj
 INC = -Iinc/
-SRC_DIR = /home/matt/Desktop/folder/Comp_paralela/atividade_05/src
-BIN_DIR = /home/matt/Desktop/folder/Comp_paralela/atividade_05/bin
+SRC_DIR = /home/matt/Desktop/folder/Computacao_Paralela/atividade05/src
+BIN_DIR = /home/matt/Desktop/folder/Computacao_Paralela/atividade05/bin
 
 app: main matrix_op
 	@echo "Linking..."
