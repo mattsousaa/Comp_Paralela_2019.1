@@ -16,11 +16,11 @@ mat2 = lerMatriz(file2, &linhas_m2, &colunas_m2);
 imprimirMatriz(mat1, linhas_m1, colunas_m1);
 imprimirMatriz(mat2, linhas_m2, colunas_m2);
 
-multiplicarMatrizes(result, mat1, linhas_m1, colunas_m1, mat2, colunas_m2, linhas_m2);
+multiplicarMatrizes(result, mat1, linhas_m1, colunas_m1, mat2, linhas_m2, colunas_m2);
 
-imprimirMatriz(result, linhas_m1, linhas_m2);
+imprimirMatriz(result, linhas_m1, colunas_m2);
 
-escreverMatriz(file3, result, linhas_m1, linhas_m2);
+escreverMatriz(file3, result, linhas_m1, colunas_m2);
 
 liberarMatriz(mat1);
 liberarMatriz(mat2);

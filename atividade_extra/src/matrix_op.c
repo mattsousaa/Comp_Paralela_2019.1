@@ -27,6 +27,12 @@ fscanf(fp1,"%d",&column);
 *linhas = row;
 *colunas = column;
 
+float *data = (float *)malloc(row * column * sizeof(float));
+
+if(column != 1){
+
+printf("matriz\n");
+
 /* Removing symbols of ":" and creating a new file of matrix without ':' */
 
 while((ch = fgetc(fp1)) != EOF){
@@ -43,8 +49,6 @@ while((ch = fgetc(fp1)) != EOF){
 fclose(fp1);
 fclose(fp2);
 
-float *data = (float *)malloc(row * column * sizeof(float));
-
 fp2 = fopen(".mat_dot.txt","r");
 
 for (i = 0; i < row; i++){
@@ -57,6 +61,22 @@ for (i = 0; i < row; i++){
 fclose(fp2);
 
 return data;
+
+} else{
+	
+//printf("Linhas: %d\n", row);
+//printf("Colunas: %d\n", column);
+
+for (i = 0; i < row; i++){
+	for(j = 0; j < column; j++){
+		fscanf(fp1,"%f",&x);
+		*(data + i*column + j) = x;
+	}
+}
+
+return data;
+	
+}
 
 }
 
