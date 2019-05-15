@@ -40,8 +40,8 @@ if(rank == 0){
     mat2 = lerMatriz(file2, &vec_vetor[0], &vec_vetor[1]);
 
     /* Variável que armazenará as dimensões do vetor */
-    dimMat2[0] = vec_vetor[1]; 
-    dimMat2[1] = vec_vetor[0];
+    dimMat2[0] = vec_vetor[0]; 
+    dimMat2[1] = vec_vetor[1];
 
      /* Vetor de auxílio da submatriz particionada */
     dimSubMat1[0] = (vec_matriz[0] / tasks_qtd);
@@ -85,17 +85,17 @@ if(rank == 0){
 /* Consolidação de resultados */
 if(rank == 0){
     /* Alocação do resultado final em um array dinâmico com dimensões obtidas */
-    result = (float*) malloc(vec_matriz[0] * vec_vetor[0] * sizeof(float));
+    result = (float*) malloc(vec_matriz[0] * vec_vetor[1] * sizeof(float));
 
     /* Chama função para multiplicar as matrizes - Realiza Cálculo local */
     multiplicarMatrizes(result, mat1, dimSubMat1[0], vec_matriz[1], mat2, dimMat2[0], dimMat2[1]);
 
     /* Recebe o cálculo de contribuição dos outros processos */
     for(int i = 1; i < tasks_qtd; i++)
-        MPI_Recv(result + i*(dimSubMat1[0]*vec_vetor[0]), dimSubMat1[0]*vec_vetor[0], MPI_FLOAT, i, 0, MPI_COMM_WORLD, &status);
+        MPI_Recv(result + i*(dimSubMat1[0]*vec_vetor[1]), dimSubMat1[0]*vec_vetor[1], MPI_FLOAT, i, 0, MPI_COMM_WORLD, &status);
 
     /* Escreve matriz resultante em um arquivo */
-    escreverMatriz(file3 ,result, vec_matriz[0], vec_vetor[0]);
+    escreverMatriz(file3 ,result, vec_matriz[0], vec_vetor[1]);
 
     /* Libera memórias para arrays alocados dinamicamente */
     liberarMatriz(mat1);
