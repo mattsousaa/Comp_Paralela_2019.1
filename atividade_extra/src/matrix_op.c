@@ -31,8 +31,6 @@ float *data = (float *)malloc(row * column * sizeof(float));
 
 if(column != 1){
 
-printf("matriz\n");
-
 /* Removing symbols of ":" and creating a new file of matrix without ':' */
 
 while((ch = fgetc(fp1)) != EOF){
