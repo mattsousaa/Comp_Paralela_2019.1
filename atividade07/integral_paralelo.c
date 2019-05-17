@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
     x = ((num_intervalo / tasks_qtd) * rank) + a;
 
     /* Todos os processos calculam um pedaço da integral, ou seja "n/tasks_qtd" */
+    /* Considerar n divisível pela quantidade de processos */
     for(int i = 0; i < n/tasks_qtd; i++){
         x += h;
         calc_task += f(x);
