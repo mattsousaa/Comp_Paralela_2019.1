@@ -113,6 +113,20 @@ void multiplicarMatrizes(float *result, float *mat1, int line_m1, int col_m1, fl
 	}	
 }
 
+/* Função para iniciar matriz com zero. Importante para não dar falha de 
+seguimentação caso algum processo leia uma matriz não alocada
+=> Parâmetros: Linhas e colunas do array;
+=> Retorno: matriz */
+float *initMatrixWithZero(int rows, int columns){
+    float *matrix = malloc(rows * columns * sizeof(float));
+
+    for(int i = 0; i < rows; i++)
+        for(int j = 0; j < columns; j++)
+			*(matrix + (i * columns) + j) = 0;
+
+    return matrix;
+}
+
 /* Função para liberar memória após alocação dinâmica de vetores
 => Parâmetros: Ponteiro do array;
 => Retorno: (void function) */
