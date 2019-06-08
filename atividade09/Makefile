@@ -1,5 +1,5 @@
 all: 
-	+@echo "Digite make serial ou make paralelo" 
+	+@echo "Digite make serial ou make paralell" 
 
 GCC = gcc 
 OMP = -fopenmp

@@ -86,7 +86,7 @@ void imprimirMatriz(double *data, int row, int column){
 
 for (int i = 0; i < row; i++){
 	for(int j = 0; j < column; j++){
-		printf("%.2f ", *(data + i*column + j));
+		printf("%.4f ", *(data + i*column + j));
 	}
 }
 
@@ -108,9 +108,9 @@ fprintf(print_data, "%d\n", column);
 
 for(i = 0; i < row; i++){
 	for(j = 0; j < column-1; j++){
-		fprintf(print_data, "%.2f:", *(data + i*column + j));
+		fprintf(print_data, "%.4lf:", *(data + i*column + j));
 	}
-	fprintf(print_data, "%.2f\n", *(data + i*column + j));
+	fprintf(print_data, "%.4f\n", *(data + i*column + j));
 }
 
 fclose(print_data);
