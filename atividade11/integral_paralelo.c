@@ -11,7 +11,7 @@
 ####################################################
 => Execução paralela
 # gcc -fopenmp integral_paralelo.c -o paralelo -lm
-# time mpirun -np 8 ./paralelo 1.0 10000.0 80000000
+# time ./serial 1.0 10000.0 80000000
 ####################################################
 */
 
