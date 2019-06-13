@@ -71,10 +71,10 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // redução com a soma das contribuições
+    /* A ideia é somar a contribuição de cada processo com uma operação de redução */
     MPI_Reduce(&calc_task, &integral_global, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     
-    // processo 0 soma o trapezio maior a contribuição de cada processo e final_integraliza printando na tela
+    /* processo com rank = 0 consolida o cálculo total e soma a integral global */ 
     if(rank == 0){
         integral_global += (f(a) + f(b)) / 2.0;
         integral_global *= h;
