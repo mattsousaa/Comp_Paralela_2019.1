@@ -142,7 +142,7 @@ void liberarMatriz(float *data){
 /* Função serial para cálculo de distâncias pelo método de Bellman Ford 
 => Parâmetros: Número de vértices e matriz do grafo;
 => Retorno: (void function) */
-void BellmanFord_serial(int vertices, float *mat1){
+void BellmanFord_serial(float *mat1, int v_grafo){
 
 /*
 This implementation takes in a graph, represented as
@@ -151,13 +151,13 @@ lists of vertices and edges, and fills two arrays
 from the source to each vertex
 */
 
-float distancia[vertices];
-int predecessor[vertices];
+float distancia[v_grafo];
+int predecessor[v_grafo];
 int i, j, k;
 
 /* Step 1: initialize graph */
 
-for (i = 0; i < vertices; i++){
+for (i = 0; i < v_grafo; i++){
     distancia[i] = INFINITY;    /* Initialize the distance to all vertices to infinity */
     predecessor[i] = -1;        /* And having a null predecessor (-1) */
 }
@@ -165,11 +165,11 @@ for (i = 0; i < vertices; i++){
 distancia[0] = 0;               /* The distance from the source to itself is, of course, zero */
 
 /* Step 2: relax edges repeatedly */
-for (i = 0; i < vertices-1; i++){
-    for (j = 0; j < vertices; j++){
-        for (k = 0; k < vertices; k++){
-            if ((distancia[j] + *(mat1 + j*vertices + k)) < distancia[k]){
-                distancia[k] = distancia[j] + *(mat1 + j*vertices + k);
+for (i = 0; i < v_grafo - 1; i++){
+    for (j = 0; j < v_grafo; j++){
+        for (k = 0; k < v_grafo; k++){
+            if ((distancia[j] + *(mat1 + j*v_grafo + k)) < distancia[k]){
+                distancia[k] = distancia[j] + *(mat1 + j*v_grafo + k);
                 predecessor[k] = j;
             }
         }
@@ -179,14 +179,14 @@ for (i = 0; i < vertices-1; i++){
 /* Step 3: check for negative-weight cycles */
 
 /*
-for (j = 0; j < vertices; j++){
-    if ((distancia[i] + *(mat1 + i*vertices + j)) > distancia[j])
+for (j = 0; j < v_grafo; j++){
+    if ((distancia[i] + *(mat1 + i*v_grafo + j)) > distancia[j])
         printf("Graph contains a negative-weight cycle\n");
 }*/
 
 /* Print distancy and predecessor */
 
-for(i = 0; i < vertices; i++)
+for(i = 0; i < v_grafo; i++)
     printf("distancia[%d]: %.2f, predecessor[%d]: %d\n", i, distancia[i], i, predecessor[i]);
 
 }
@@ -194,7 +194,7 @@ for(i = 0; i < vertices; i++)
 /* Função paralela para cálculo de distâncias pelo método de Bellman Ford 
 => Parâmetros: Número de vértices, matriz do grafo e quantidade de threads definidas no OMP;
 => Retorno: (void function) */
-void BellmanFord_paralelo(int vertices, float *mat1, int p){
+void BellmanFord_paralelo(float *mat1, int v_grafo, int qtd_threads){
 
 /*
 This implementation takes in a graph, represented as
@@ -203,71 +203,82 @@ lists of vertices and edges, and fills two arrays
 from the source to each vertex
 */
 
-int i, j;
+int i, j, k;
 float weight;
-float distancia[vertices];
-int predecessor[vertices];
+int who_am_i;
+float distancia[v_grafo];
+int predecessor[v_grafo];
 
-/* Assim como na atividade 12 iremos definir um início e um fim para o cálculo 
-da atividade para cada thread */
-int chunk_init[p], chunk_end[p];
+/* As variáveis abaixo calculam o trabalho global e local das threads */
+int calc_thread_total, calc_thread[qtd_threads];
+
+/* É precido definir os extremos para o cálculo local de cada thread.
+As variáveis abaixo definem as partes de cada vértice (chunk) para execução. */
+int chunk_init[qtd_threads], chunk_end[qtd_threads];
 
 /* Step 1: Encontrar os limites locais para cada thread a partir dos vértices */
-int local_limit = vertices / p;
+int local_limit = v_grafo / qtd_threads;
 
 /* Inicializa laço paralelo */
 #pragma omp parallel for
-    for(i = 0; i < p; i++){
+    for(i = 0; i < qtd_threads; i++){
         chunk_init[i] = local_limit * i;
         chunk_end[i] = local_limit * (i + 1);
 
-        if (i == p - 1) chunk_end[i] = vertices;
+        if (i == qtd_threads - 1) chunk_end[i] = v_grafo;
         
     }
 
 /* Inicializa laço paralelo */
 #pragma omp parallel for
     /* Step 2: initialize graph */
-    for (i = 0; i < vertices; i++){
+    for (i = 0; i < v_grafo; i++){
         distancia[i] = INFINITY;    /* Initialize the distance to all vertices to infinity */
         predecessor[i] = -1;        /* And having a null predecessor (-1) */
     }
     distancia[0] = 0;               /* The distance from the source to itself is, of course, zero */
     
-int calc_thread_total, calc_thread[p];
 
-#pragma omp parallel shared(chunk_init, chunk_end, distancia, predecessor, vertices, calc_thread) private(weight)
+/* Inicializa processo de paralização do código serial pela função "BellmanFord_serial" */
+#pragma omp parallel shared(predecessor, v_grafo, calc_thread, distancia, chunk_init, chunk_end) private(weight)
     {   
         int atual_thread = omp_get_thread_num();
-        for (int k = 0; k < vertices - 1; k++){
+        for(int i = 0; i < v_grafo - 1; i++){
             /* Step 3: relax edges repeatedly */
             calc_thread[atual_thread] = 0;
-            for (int i = 0; i < vertices; i++){
-                for (int j = chunk_init[atual_thread]; j < chunk_end[atual_thread]; j++){
-                    weight = *(mat1 + i*vertices + j);
-                    if (*(mat1 + i*vertices + j) < INFINITY){
-                        if ((distancia[i] + weight) < distancia[j]){
-                            distancia[j] = distancia[i] + weight;
-                            predecessor[j] = i;
+            for(int j = 0; j < v_grafo; j++){
+                for(int k = chunk_init[atual_thread]; k < chunk_end[atual_thread]; k++){
+                    weight = *(mat1 + j*v_grafo + k);
+                    if(*(mat1 + j*v_grafo + k) < INFINITY){
+                        if((distancia[j] + weight) < distancia[k]){
+                            distancia[k] = distancia[j] + weight;
+                            predecessor[k] = j;
                             calc_thread[atual_thread] = 1;
-                        }
+                        } /*else{
+                            printf("Graph contains a negative-weight cycle\n");
+                        }*/
                     }
                 }
             }
+
+/* É necessário uma barreira de sincronização para todas as threads sincronizarem*/
 #pragma omp barrier
 #pragma omp single
-            {
-                calc_thread_total = 0;
-                for (int thread_who = 0; thread_who < p; thread_who++)    calc_thread_total != calc_thread[thread_who];
-                
-            }
+        {
+            calc_thread_total = 0;
+            for(int who_am_i = 0; who_am_i < qtd_threads; who_am_i++)    
+                INIT_SYNCRONIZATION(calc_thread_total, calc_thread, who_am_i);   
+        }
 
-            if (!calc_thread_total) break;
+        /* Se o trabalho total de todas as threads acabar, então sai do laço paralelo */
+        if(!calc_thread_total) break;
             
         }
     }
 
-    for (int i = 0; i < vertices; i++)
-        printf("distancia[%d]: %.2f, predecessor[%d]: %d\n", i, distancia[i], i, predecessor[i]);
+/* Print distancy and predecessor */
+
+for(int i = 0; i < v_grafo; i++)
+    printf("distancia[%d]: %.2f, predecessor[%d]: %d\n", i, distancia[i], i, predecessor[i]);
     
 }
