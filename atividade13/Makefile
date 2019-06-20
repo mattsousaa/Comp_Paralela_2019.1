@@ -1,5 +1,5 @@
 all: 
-	+@echo "Digite make serial ou make paralell" 
+	+@echo "Ajuste primeiramente o bloco desejado no arquivo /src/main.c. Depois digite make serial ou make paralell." 
 
 GCC = gcc 
 OMP = -fopenmp

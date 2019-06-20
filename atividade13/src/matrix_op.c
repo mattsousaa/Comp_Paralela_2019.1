@@ -219,24 +219,21 @@ int chunk_init[qtd_threads], chunk_end[qtd_threads];
 /* Step 1: Encontrar os limites locais para cada thread a partir dos vértices */
 int local_limit = v_grafo / qtd_threads;
 
-/* Inicializa laço paralelo */
-#pragma omp parallel for
-    for(i = 0; i < qtd_threads; i++){
-        chunk_init[i] = local_limit * i;
-        chunk_end[i] = local_limit * (i + 1);
 
-        if (i == qtd_threads - 1) chunk_end[i] = v_grafo;
-        
-    }
+for(i = 0; i < qtd_threads; i++){
+    chunk_init[i] = local_limit * i;
+    chunk_end[i] = local_limit * (i + 1);
 
-/* Inicializa laço paralelo */
-#pragma omp parallel for
-    /* Step 2: initialize graph */
-    for (i = 0; i < v_grafo; i++){
-        distancia[i] = INFINITY;    /* Initialize the distance to all vertices to infinity */
-        predecessor[i] = -1;        /* And having a null predecessor (-1) */
-    }
-    distancia[0] = 0;               /* The distance from the source to itself is, of course, zero */
+    if (i == qtd_threads - 1) chunk_end[i] = v_grafo;
+    
+}
+
+/* Step 2: initialize graph */
+for (i = 0; i < v_grafo; i++){
+    distancia[i] = INFINITY;    /* Initialize the distance to all vertices to infinity */
+    predecessor[i] = -1;        /* And having a null predecessor (-1) */
+}
+distancia[0] = 0;               /* The distance from the source to itself is, of course, zero */
     
 
 /* Inicializa processo de paralização do código serial pela função "BellmanFord_serial" */
@@ -266,7 +263,7 @@ int local_limit = v_grafo / qtd_threads;
 #pragma omp single
         {
             calc_thread_total = 0;
-            for(int who_am_i = 0; who_am_i < qtd_threads; who_am_i++)    
+            for(who_am_i = 0; who_am_i < qtd_threads; who_am_i++)    
                 INIT_SYNCRONIZATION(calc_thread_total, calc_thread, who_am_i);   
         }
 
@@ -278,7 +275,7 @@ int local_limit = v_grafo / qtd_threads;
 
 /* Print distancy and predecessor */
 
-for(int i = 0; i < v_grafo; i++)
+for(i = 0; i < v_grafo; i++)
     printf("distancia[%d]: %.2f, predecessor[%d]: %d\n", i, distancia[i], i, predecessor[i]);
     
 }
