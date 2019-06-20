@@ -178,10 +178,11 @@ for (i = 0; i < vertices-1; i++){
 
 /* Step 3: check for negative-weight cycles */
 
+/*
 for (j = 0; j < vertices; j++){
     if ((distancia[i] + *(mat1 + i*vertices + j)) > distancia[j])
         printf("Graph contains a negative-weight cycle\n");
-}
+}*/
 
 /* Print distancy and predecessor */
 
