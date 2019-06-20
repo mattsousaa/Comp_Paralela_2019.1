@@ -26,7 +26,7 @@ double f(double x) {
 int main(int argc, char *argv[]) {
 
     // Valor da integral global
-    double integral_global = 0; 
+    double integral_global = 0.0; 
     // Limites do intervalo
     double a, b;
     // Número de trapézios
@@ -42,6 +42,9 @@ int main(int argc, char *argv[]) {
     a = atof(argv[1]);
     b = atof(argv[2]);
     n = atoi(argv[3]);
+    
+    /* Cálculo do tamanho do trapézio */ 
+    h = (b - a) / n;
 
     /* Variáveis do MPI */
     int tasks_qtd, It_qtd, rank;
@@ -54,11 +57,11 @@ int main(int argc, char *argv[]) {
     /* Todos os processos calculam um x local - inicio da integral */
     x = (((b - a) / tasks_qtd) * rank) + a;
     
-    double init_integral = x;                           /* Início do cálculo */
+    double init_integral = x;                                       /* Início do cálculo */
     double final_integral = x + ((b - a) / tasks_qtd);  /* Fim do cálculo */
     
     /* Redução na variável "calc_task" */
-    #pragma omp parallel shared(init_integral, final_integral, h, n) private(x, i, area_trapezio) reduction(+:calc_task)
+    #pragma omp parallel shared(init_integral, final_integral, n, h) private(x, i, area_trapezio) reduction(+:calc_task)
 
     {
         /* Cada thread ficará responsável por uma parte da área do trapézio */
