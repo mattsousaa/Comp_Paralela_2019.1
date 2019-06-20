@@ -153,7 +153,7 @@ from the source to each vertex
 
 float distancia[vertices];
 int predecessor[vertices];
-int i, j;
+int i, j, k;
 
 /* Step 1: initialize graph */
 
@@ -165,12 +165,13 @@ for (i = 0; i < vertices; i++){
 distancia[0] = 0;               /* The distance from the source to itself is, of course, zero */
 
 /* Step 2: relax edges repeatedly */
-
-for (i = 0; i < vertices; i++){
-    for (j = 0; j < vertices; j++){
-        if ((distancia[i] + *(mat1 + i*vertices + j)) < distancia[j]){
-            distancia[j] = distancia[i] + *(mat1 + i*vertices + j);
-            predecessor[j] = i;
+for (k = 0; k < vertices-1; k++){
+    for (i = 0; i < vertices; i++){
+        for (j = 0; j < vertices; j++){
+            if ((distancia[i] + *(mat1 + i*vertices + j)) < distancia[j]){
+                distancia[j] = distancia[i] + *(mat1 + i*vertices + j);
+                predecessor[j] = i;
+            }
         }
     }
 }
